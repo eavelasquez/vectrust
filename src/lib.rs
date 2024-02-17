@@ -37,8 +37,20 @@ impl<T> VectRust<T> {
             self.ptr = ptr;
             self.len = 1;
             self.capacity = 4;
-        } else if self.len <= self.capacity {
-            todo!("Implement push for when capacity is not zero and len <= capacity")
+        } else if self.len < self.capacity {
+            let offset = self
+                .len
+                .checked_mul(mem::size_of::<T>())
+                .expect("Cannot reach memory location");
+            assert!(offset < isize::MAX as usize, "Wrapped isize");
+
+            // SAFETY: self.len is less than self.capacity, so we have space to write to.
+            unsafe {
+                // Offset cannot wrap around and pointer is pointing to valid memory
+                // and writing to an offset at self.len is valid
+                self.ptr.as_ptr().add(self.len).write(value);
+            }
+            self.len += 1;
         } else {
             todo!("Implement push for when capacity is not zero and len > capacity")
         }
@@ -61,6 +73,7 @@ mod tests {
     fn it_works() {
         let mut vec: VectRust<usize> = VectRust::new();
         vec.push(1usize);
+        vec.push(2usize);
 
         assert_eq!(vec.capacity(), 4);
         assert_eq!(vec.len(), 1);

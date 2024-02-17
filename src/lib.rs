@@ -52,7 +52,29 @@ impl<T> VectRust<T> {
             }
             self.len += 1;
         } else {
-            todo!("Implement push for when capacity is not zero and len > capacity")
+            debug_assert!(self.len == self.capacity);
+
+            let size = std::mem::size_of::<T>() * self.capacity;
+            let align = mem::align_of::<T>();
+
+            size.checked_add(size % align).expect("Cannot allocate");
+
+            let new_capacity = self.capacity.checked_mul(2).expect("Capacity wrapped");
+
+            let ptr = unsafe {
+                let layout = Layout::from_size_align_unchecked(size, align);
+                let new_size = mem::size_of::<T>() * new_capacity;
+                let ptr = alloc::realloc(self.ptr.as_ptr() as *mut u8, layout, new_size);
+    
+                let ptr = NonNull::new(ptr as *mut T).expect("Could not reallocate");
+                ptr.as_ptr().add(self.len).write(value);
+    
+                ptr
+            };
+    
+            self.ptr = ptr;
+            self.len += 1;
+            self.capacity = new_capacity;
         }
     }
 
@@ -73,9 +95,12 @@ mod tests {
     fn it_works() {
         let mut vec: VectRust<usize> = VectRust::new();
         vec.push(1usize);
-        vec.push(2usize);
+        vec.push(2);
+        vec.push(3);
+        vec.push(4);
+        vec.push(5);
 
-        assert_eq!(vec.capacity(), 4);
-        assert_eq!(vec.len(), 1);
+        assert_eq!(vec.capacity(), 8);
+        assert_eq!(vec.len(), 5);
     }
 }

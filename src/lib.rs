@@ -37,6 +37,10 @@ impl<T> VectRust<T> {
             self.ptr = ptr;
             self.len = 1;
             self.capacity = 4;
+        } else if self.len <= self.capacity {
+            todo!("Implement push for when capacity is not zero and len <= capacity")
+        } else {
+            todo!("Implement push for when capacity is not zero and len > capacity")
         }
     }
 

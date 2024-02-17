@@ -13,5 +13,5 @@ make help
 Also, to check any memory-related issues, you can use [`valgrind`](https://valgrind.org/).
 
 ```bash
-valgrind ./target/release/vectrust
+valgrind --leak-check=full ./target/release/vectrust
 ```

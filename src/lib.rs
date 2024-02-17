@@ -65,13 +65,13 @@ impl<T> VectRust<T> {
                 let layout = Layout::from_size_align_unchecked(size, align);
                 let new_size = mem::size_of::<T>() * new_capacity;
                 let ptr = alloc::realloc(self.ptr.as_ptr() as *mut u8, layout, new_size);
-    
+
                 let ptr = NonNull::new(ptr as *mut T).expect("Could not reallocate");
                 ptr.as_ptr().add(self.len).write(value);
-    
+
                 ptr
             };
-    
+
             self.ptr = ptr;
             self.len += 1;
             self.capacity = new_capacity;

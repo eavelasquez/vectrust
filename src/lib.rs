@@ -78,6 +78,14 @@ impl<T> VectRust<T> {
         }
     }
 
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index >= self.len {
+            return None;
+        }
+
+        Some(unsafe { &*self.ptr.as_ptr().add(index) })
+    }
+
     pub fn capacity(&self) -> usize {
         self.capacity
     }

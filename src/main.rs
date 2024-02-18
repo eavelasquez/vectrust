@@ -8,6 +8,9 @@ fn main() {
     vec.push(4);
     vec.push(5);
 
+    for i in 0..vec.len() {
+        assert_eq!(vec.get(i), Some(&(i + 1)));
+    }
     assert_eq!(vec.capacity(), 8);
     assert_eq!(vec.len(), 5);
 }

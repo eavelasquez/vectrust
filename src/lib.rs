@@ -87,6 +87,19 @@ impl<T> VectRust<T> {
     }
 }
 
+impl<T> Drop for VectRust<T> {
+    fn drop(&mut self) {
+        unsafe {
+            std::ptr::drop_in_place(std::slice::from_raw_parts_mut(self.ptr.as_ptr(), self.len));
+            let layout = Layout::from_size_align_unchecked(
+                mem::size_of::<T>() * self.capacity,
+                mem::align_of::<T>(),
+            );
+            alloc::dealloc(self.ptr.as_ptr() as *mut u8, layout)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
